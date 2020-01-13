@@ -3,10 +3,8 @@ import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormLabel from "@material-ui/core/FormLabel";
-import TextField from "@material-ui/core/TextField";
+// import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
-
-import LoadingSpinner from "../LoadingSpinner";
 
 const errorMessageStyles = makeStyles({
   styledWarning: props => ({
@@ -16,6 +14,9 @@ const errorMessageStyles = makeStyles({
 });
 
 const jsonFormStyles = makeStyles({
+  styledRadioContainer: {
+    marginBottom: "10px"
+  },
   styledRadioGroup: {
     flexDirection: "row !important"
   },
@@ -40,9 +41,8 @@ const ErrorMessage = props => {
 const JsonForm = ({
   data,
   error,
-  isLoading,
   setFormAnswer,
-  setCommentAnswer,
+  // setCommentAnswer,
   formError
 }) => {
   const classes = jsonFormStyles();
@@ -53,13 +53,11 @@ const JsonForm = ({
 
   return (
     <>
-      {isLoading ? (
-        <div className={classes.loadingContainer}>
-          <LoadingSpinner />
-        </div>
-      ) : !error && data.length ? (
+      {!error && data.length ? (
         data.map((pregunta, indexP) => (
-          <div key={pregunta.idpregunta}>
+          <div
+            className={classes.styledRadioContainer}
+            key={pregunta.idpregunta}>
             <FormLabel component="legend">{pregunta.pregunta}</FormLabel>
             <RadioGroup
               className={classes.styledRadioGroup}
@@ -75,8 +73,10 @@ const JsonForm = ({
                   />
                 ))}
             </RadioGroup>
-            <ErrorMessage visible={formError.includes(pregunta.idpregunta)} />
-            <TextField
+            <ErrorMessage
+              visible={formError && formError.includes(pregunta.idpregunta)}
+            />
+            {/* <TextField
               className={classes.styledTextField}
               fullWidth
               label="Comentario"
@@ -90,7 +90,7 @@ const JsonForm = ({
                   : ""
               }
               variant="outlined"
-            />
+            /> */}
           </div>
         ))
       ) : (

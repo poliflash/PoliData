@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function CircularIndeterminate() {
+const LoadingSpinner = () => {
   const classes = useStyles();
 
   return (
@@ -20,3 +20,5 @@ export default function CircularIndeterminate() {
     </div>
   );
 }
+
+export default LoadingSpinner; 

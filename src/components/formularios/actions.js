@@ -1,17 +1,18 @@
 import {
-  SET_JSON_FORM,
+  SET_JSON,
   SET_ANSWER,
   SET_COMMENT,
   SUBMIT_FORM,
   SET_IS_OPEN_DIALOG
 } from "./actionTypes";
 
-export const setJsonForm = payload => ({
+export const setJson = payload => ({
   payload,
-  type: SET_JSON_FORM
+  type: SET_JSON
 });
 
-export const setAnswer = payload => ({
+export const setAnswer = (id, payload) => ({
+  id,
   payload,
   type: SET_ANSWER
 });
@@ -22,7 +23,8 @@ export const setComment = (payload, event) => ({
   type: SET_COMMENT
 });
 
-export const submitForm = () => ({
+export const submitForm = id => ({
+  id: id,
   type: SUBMIT_FORM
 });
 

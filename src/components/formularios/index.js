@@ -1,15 +1,17 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useState, useReducer } from "react";
 import JsonForm from "./JsonForm";
-import { useFetch } from "../hooks/useFetch";
+import LoadingSpinner from "../LoadingSpinner";
+import { useFetchPost } from "../hooks/useFetchPost";
 import {
-  setJsonForm,
+  setJson,
   setAnswer,
-  setComment,
-  submitForm,
-  setIsOpenDialog
+  // setComment,
+  submitForm
+  // setIsOpenDialog
 } from "./actions";
 import { initialState, reducer } from "./reducer";
 
+import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -17,73 +19,66 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import FormControl from "@material-ui/core/FormControl";
 import { makeStyles } from "@material-ui/core/styles";
+// import isEmpty from "lodash/isEmpty";
 
 const useStyles = makeStyles({
-  formContainer: {
-    height: "90vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center"
+  styledFormsContainer: {
+    marginTop: "60px",
+    height: "calc(100vh - 60px)"
+  },
+  styledFormContainer: {
+    textAlign: "center"
   }
 });
 
-const Formulario = () => {
-  const classes = useStyles();
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const url =
-    "https://f2020.azurewebsites.net/api/FaroFormularioBase?code=5mWvvpNVz/at91R4awZb7g/rSfVWeHbMSARrVFbEdZWtC2fWBaGtnQ==&id=conectividad";
+const Formulario = ({ id, data, title, message, state, isError, dispatch }) => {
+  const [open, setOpen] = useState(false);
 
-  const { data, isLoading, isError } = useFetch(url);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
-  const setIsOpen = status => {
-    dispatch(setIsOpenDialog(status));
+  const handleClose = () => {
+    setOpen(false);
   };
 
   const setFormAnswer = val => {
-    dispatch(setAnswer(val));
+    dispatch(setAnswer(id, val));
   };
 
-  const setCommentAnswer = index => e => {
-    dispatch(setComment(index, e.target.value));
-  };
+  // const setCommentAnswer = e => {
+  //   dispatch(setComment(id, e.target.value));
+  // };
 
   const onSubmit = () => {
-    dispatch(submitForm());
+    dispatch(submitForm(id));
   };
 
-  useEffect(() => {
-    !isLoading && data && dispatch(setJsonForm(data[0].preguntas));
-  }, [data, isLoading]);
-
   return (
-    <div className={classes.formContainer}>
-      <Button
-        variant="outlined"
-        color="primary"
-        onClick={() => setIsOpen(true)}>
-        Formulario
+    <>
+      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+        {title}
       </Button>
       <Dialog
         fullWidth
         maxWidth="md"
-        open={state.isOpenDialog}
-        onClose={() => setIsOpen(false)}
+        open={open}
+        onClose={handleClose}
         aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Formulario</DialogTitle>
+        <DialogTitle id="form-dialog-title">{message.encabezado}</DialogTitle>
         <DialogContent dividers>
           <FormControl fullWidth component="fieldset">
             <JsonForm
               error={isError}
-              isLoading={isLoading}
-              formError={state.error}
+              data={data && data}
+              formError={state.error[id] && state.error[id]}
               setFormAnswer={setFormAnswer}
-              data={state.preguntas && state.preguntas}
-              setCommentAnswer={setCommentAnswer}
+              // setCommentAnswer={setCommentAnswer}
             />
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsOpen(false)} color="primary">
+          <Button onClick={handleClose} color="primary">
             Cancelar
           </Button>
           <Button onClick={onSubmit} color="primary">
@@ -91,8 +86,64 @@ const Formulario = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
 
-export default Formulario;
+const Formularios = ({ cedula }) => {
+  const classes = useStyles();
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const url =
+    "https://f2020.azurewebsites.net/api/FaroFormulariosPersona?code=nbjfp6Cn8Mx3/WPr3DCwMXV8EZbfw2CB8UIMOTyfW8TYtlBSsbXGqw==";
+
+  const {
+    dataPost: data,
+    isLoadingPost: isLoading,
+    isErrorPost: isError
+  } = useFetchPost(url, {
+    id: {
+      cedula: cedula
+    }
+  });
+
+  useEffect(() => {
+    !isLoading && data && dispatch(setJson(data));
+  }, [data, isLoading]);
+
+  return (
+    <Grid
+      className={classes.styledFormsContainer}
+      direction="row"
+      justify="center"
+      alignItems="center"
+      container
+      spacing={0}>
+      {data && !isLoading ? (
+        data.map(formulario => (
+          <Grid
+            className={classes.styledFormContainer}
+            item
+            xs={12}
+            sm={6}
+            md={4}
+            lg={3}>
+            <Formulario
+              key={formulario.id}
+              state={state}
+              isError={isError}
+              id={formulario.id}
+              dispatch={dispatch}
+              data={formulario.preguntas}
+              message={formulario.mensaje}
+              title={formulario.idformulario}
+            />
+          </Grid>
+        ))
+      ) : (
+        <LoadingSpinner />
+      )}
+    </Grid>
+  );
+};
+export default Formularios;

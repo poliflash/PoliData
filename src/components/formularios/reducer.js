@@ -1,52 +1,64 @@
+import isEmpty from "lodash/isEmpty";
 import {
-  SET_JSON_FORM,
+  SET_JSON,
   SET_ANSWER,
-  SET_COMMENT,
+  // SET_COMMENT,
   SUBMIT_FORM,
   SET_IS_OPEN_DIALOG
 } from "./actionTypes";
 
 export const initialState = {
-  preguntas: [],
-  qtyPreguntas: 0,
-  error: [],
+  formularios: [],
+  qtyFormularios: 0,
+  error: {},
   isOpenDialog: false,
   formCompleted: false,
   formSubmitted: false
 };
 
 export const reducer = (state, action) => {
-  const preguntas = state.preguntas;
+  const formularios = state.formularios;
   switch (action.type) {
     case SET_IS_OPEN_DIALOG:
       return { ...state, isOpenDialog: action.payload, error: [] };
-    case SET_JSON_FORM:
+    case SET_JSON:
       return {
         ...state,
-        preguntas: action.payload,
-        qtyPreguntas: action.payload.length
+        formularios: action.payload,
+        qtyFormularios: action.payload.length
       };
     case SET_ANSWER:
+      const index = formularios.findIndex(v => v.id === action.id);
       const payload = action.payload.split("-");
       const indexPregunta = payload[0];
       const idRespuesta = payload[1];
       const respuesta = payload[2];
 
-      preguntas[indexPregunta]["idrespuesta"] = idRespuesta;
-      preguntas[indexPregunta]["respuesta"] = respuesta;
+      formularios[index].preguntas[indexPregunta]["idrespuesta"] = idRespuesta;
+      formularios[index].preguntas[indexPregunta]["respuesta"] = respuesta;
 
-      return { ...state, preguntas: preguntas };
-    case SET_COMMENT:
-      preguntas[action.payload]["comentario"] = action.event;
-      return { ...state, preguntas: preguntas };
+      return { ...state, formularios: formularios };
+    // case SET_COMMENT:
+    //   formulario[action.payload]["comentario"] = action.event;
+    //   return { ...state, formulario: formulario };
     case SUBMIT_FORM:
-      const errors = [];
-      preguntas.forEach(pregunta => {
-        if (Number(pregunta.idrespuesta) === 0)
-          errors.push(pregunta.idpregunta);
+      let errors = state.error;
+      const id = action.id;
+      const formularioIndex = formularios.findIndex(v => v.id === action.id);
+
+      formularios[formularioIndex].preguntas.forEach(pregunta => {
+        if (Number(pregunta.idrespuesta) === 0) {
+          if (errors[id] && !errors[id].includes(pregunta.idpregunta)) {
+            errors[id].push(pregunta.idpregunta);
+          } else if (!errors[id]) {
+            errors[id] = [pregunta.idpregunta];
+          }
+        } else {
+          errors = {};
+        }
       });
 
-      if (errors.length) {
+      if (!isEmpty(errors)) {
         return { ...state, error: errors };
       }
 
