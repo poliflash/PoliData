@@ -73,9 +73,7 @@ const JsonForm = ({
                   />
                 ))}
             </RadioGroup>
-            <ErrorMessage
-              visible={formError && formError.includes(pregunta.idpregunta)}
-            />
+            <ErrorMessage visible={formError.includes(pregunta.idpregunta)} />
             {/* <TextField
               className={classes.styledTextField}
               fullWidth

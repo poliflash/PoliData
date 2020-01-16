@@ -4,10 +4,8 @@ import LoadingSpinner from "../LoadingSpinner";
 import { useFetchPost } from "../hooks/useFetchPost";
 import {
   setJson,
-  setAnswer,
+  setAnswer
   // setComment,
-  submitForm
-  // setIsOpenDialog
 } from "./actions";
 import { initialState, reducer } from "./reducer";
 
@@ -19,7 +17,6 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import FormControl from "@material-ui/core/FormControl";
 import { makeStyles } from "@material-ui/core/styles";
-// import isEmpty from "lodash/isEmpty";
 
 const useStyles = makeStyles({
   styledFormsContainer: {
@@ -31,8 +28,20 @@ const useStyles = makeStyles({
   }
 });
 
-const Formulario = ({ id, data, title, message, state, isError, dispatch }) => {
+const Formulario = ({
+  id,
+  index,
+  data,
+  title,
+  message,
+  state,
+  isError,
+  dispatch
+}) => {
   const [open, setOpen] = useState(false);
+  const [formError, setFormError] = useState([]);
+  const [isLoadingPost, setIsLoadingPost] = useState(false);
+  const [isErrorPost, setIsErrorPost] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -50,8 +59,45 @@ const Formulario = ({ id, data, title, message, state, isError, dispatch }) => {
   //   dispatch(setComment(id, e.target.value));
   // };
 
-  const onSubmit = () => {
-    dispatch(submitForm(id));
+  const validateForm = () => {
+    let errors = [];
+    data.forEach(pregunta => {
+      if (Number(pregunta.idrespuesta) === 0) {
+        errors.push(pregunta.idpregunta);
+        setFormError([...errors]);
+      }
+    });
+
+    if (!errors.length) {
+      setFormError([]);
+      submitForm();
+    }
+  };
+
+  const submitForm = async () => {
+    const postUrl =
+      "https://f2020.azurewebsites.net/api/FaroFormularioPersonaPost?code=rkmGB0kHPzpU/Nxb7L8NT1PAw6jmOxslIH2eXiyjh9vmFIjFRFblAw==";
+
+    setIsErrorPost(false);
+    setIsLoadingPost(true);
+    try {
+      const config = {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(state.formularios[index])
+      };
+
+      await fetch(postUrl, config);
+      setIsErrorPost(false);
+      setIsLoadingPost(false);
+      setOpen(false);
+    } catch (error) {
+      setIsErrorPost(true);
+      setIsLoadingPost(false);
+    }
   };
 
   return (
@@ -71,7 +117,7 @@ const Formulario = ({ id, data, title, message, state, isError, dispatch }) => {
             <JsonForm
               error={isError}
               data={data && data}
-              formError={state.error[id] && state.error[id]}
+              formError={formError}
               setFormAnswer={setFormAnswer}
               // setCommentAnswer={setCommentAnswer}
             />
@@ -81,8 +127,8 @@ const Formulario = ({ id, data, title, message, state, isError, dispatch }) => {
           <Button onClick={handleClose} color="primary">
             Cancelar
           </Button>
-          <Button onClick={onSubmit} color="primary">
-            Enviar
+          <Button onClick={validateForm} color="primary">
+            {isLoadingPost ? "Enviando..." : "Enviar"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -120,8 +166,9 @@ const Formularios = ({ cedula }) => {
       container
       spacing={0}>
       {data && !isLoading ? (
-        data.map(formulario => (
+        data.map((formulario, index) => (
           <Grid
+            key={formulario.id}
             className={classes.styledFormContainer}
             item
             xs={12}
@@ -129,7 +176,7 @@ const Formularios = ({ cedula }) => {
             md={4}
             lg={3}>
             <Formulario
-              key={formulario.id}
+              index={index}
               state={state}
               isError={isError}
               id={formulario.id}
