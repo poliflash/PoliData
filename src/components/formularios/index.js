@@ -2,11 +2,7 @@ import React, { useEffect, useState, useReducer } from "react";
 import JsonForm from "./JsonForm";
 import LoadingSpinner from "../LoadingSpinner";
 import { useFetchPost } from "../hooks/useFetchPost";
-import {
-  setJson,
-  setAnswer
-  // setComment,
-} from "./actions";
+import { setJson, setAnswer, setDirecciones } from "./actions";
 import { initialState, reducer } from "./reducer";
 
 import Grid from "@material-ui/core/Grid";
@@ -32,10 +28,12 @@ const Formulario = ({
   id,
   index,
   data,
+  dataPersona,
   title,
   message,
   state,
   isError,
+  idformulario,
   dispatch
 }) => {
   const [open, setOpen] = useState(false);
@@ -51,22 +49,61 @@ const Formulario = ({
     setOpen(false);
   };
 
+  const setInputDirecciones = (val, indexPregunta) => {
+    dispatch(setDirecciones(id, { val, indexPregunta }));
+  };
+
   const setFormAnswer = val => {
     dispatch(setAnswer(id, val));
   };
 
-  // const setCommentAnswer = e => {
-  //   dispatch(setComment(id, e.target.value));
-  // };
+  const convertRes = {
+    Correo: "EM",
+    Celular: "TC",
+    Twitter: "TW"
+  };
+
+  const getIndexOf = respuesta => {
+    const res = convertRes[respuesta];
+    let dir = null;
+    dataPersona.direcciones.forEach(direccion => {
+      if (direccion.idrespuesta === res) {
+        dir = direccion;
+        return;
+      }
+    });
+    return dir;
+  };
 
   const validateForm = () => {
     let errors = [];
-    data.forEach(pregunta => {
-      if (Number(pregunta.idrespuesta) === 0) {
-        errors.push(pregunta.idpregunta);
-        setFormError([...errors]);
-      }
-    });
+    if (idformulario === "DIRECCIONES") {
+      data.forEach((pregunta, indexP) => {
+        pregunta.respuestas.forEach(respuesta => {
+          if (
+            respuesta.texto === "" &&
+            (getIndexOf(respuesta.respuesta) === null ||
+              getIndexOf(respuesta.respuesta).texto === "")
+          ) {
+            errors.push(pregunta.idpregunta);
+            setFormError([...errors]);
+          }
+          if (
+            getIndexOf(respuesta.respuesta) !== null &&
+            getIndexOf(respuesta.respuesta).texto !== ""
+          ) {
+            setInputDirecciones(getIndexOf(respuesta.respuesta).texto, indexP);
+          }
+        });
+      });
+    } else {
+      data.forEach(pregunta => {
+        if (Number(pregunta.idrespuesta) === 0) {
+          errors.push(pregunta.idpregunta);
+          setFormError([...errors]);
+        }
+      });
+    }
 
     if (!errors.length) {
       setFormError([]);
@@ -115,11 +152,13 @@ const Formulario = ({
         <DialogContent dividers>
           <FormControl fullWidth component="fieldset">
             <JsonForm
-              error={isError}
               data={data && data}
-              formError={formError}
+              error={isError}
               setFormAnswer={setFormAnswer}
-              // setCommentAnswer={setCommentAnswer}
+              setInputDirecciones={setInputDirecciones}
+              idformulario={idformulario}
+              getIndexOf={getIndexOf}
+              formError={formError}
             />
           </FormControl>
         </DialogContent>
@@ -136,7 +175,7 @@ const Formulario = ({
   );
 };
 
-const Formularios = ({ cedula }) => {
+const Formularios = ({ dataPersona, cedula }) => {
   const classes = useStyles();
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -180,8 +219,10 @@ const Formularios = ({ cedula }) => {
               state={state}
               isError={isError}
               id={formulario.id}
+              idformulario={formulario.idformulario}
               dispatch={dispatch}
               data={formulario.preguntas}
+              dataPersona={dataPersona}
               message={formulario.mensaje}
               title={formulario.idformulario}
             />

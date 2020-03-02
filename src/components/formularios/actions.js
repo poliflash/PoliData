@@ -1,4 +1,4 @@
-import { SET_JSON, SET_ANSWER, SET_COMMENT } from "./actionTypes";
+import { SET_JSON, SET_ANSWER, SET_DIRECCIONES } from "./actionTypes";
 
 export const setJson = payload => ({
   payload,
@@ -11,8 +11,8 @@ export const setAnswer = (id, payload) => ({
   type: SET_ANSWER
 });
 
-export const setComment = (payload, event) => ({
+export const setDirecciones = (id, payload) => ({
+  id,
   payload,
-  event,
-  type: SET_COMMENT
+  type: SET_DIRECCIONES
 });

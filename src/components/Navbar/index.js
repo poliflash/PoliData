@@ -3,8 +3,6 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import { makeStyles } from "@material-ui/core/styles";
 
-import { useFetch } from "../hooks/useFetch";
-
 const useStyles = makeStyles({
   styledAppBar: {
     backgroundColor: "#0070c0"
@@ -19,12 +17,8 @@ const useStyles = makeStyles({
   }
 });
 
-const Navbar = ({ cedula }) => {
+const Navbar = ({ data, isLoading, isError }) => {
   const classes = useStyles();
-  const url =
-    "https://openfaroapi.azurewebsites.net/api/personaget?identificacion=";
-
-  const { data, isLoading, isError } = useFetch(url + cedula);
 
   return (
     <AppBar className={classes.styledAppBar}>

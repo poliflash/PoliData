@@ -1,16 +1,13 @@
-import {
-  SET_JSON,
-  SET_ANSWER
-  // SET_COMMENT,
-} from "./actionTypes";
+import { SET_JSON, SET_ANSWER, SET_DIRECCIONES } from "./actionTypes";
 
 export const initialState = {
   formularios: [],
-  qtyFormularios: 0,
+  qtyFormularios: 0
 };
 
 export const reducer = (state, action) => {
   const formularios = state.formularios;
+  let index, payload, indexPregunta, idRespuesta, respuesta;
   switch (action.type) {
     case SET_JSON:
       return {
@@ -19,19 +16,27 @@ export const reducer = (state, action) => {
         qtyFormularios: action.payload.length
       };
     case SET_ANSWER:
-      const index = formularios.findIndex(v => v.id === action.id);
-      const payload = action.payload.split("-");
-      const indexPregunta = payload[0];
-      const idRespuesta = payload[1];
-      const respuesta = payload[2];
+      index = formularios.findIndex(v => v.id === action.id);
+      payload = action.payload.split("-");
+      indexPregunta = payload[0];
+      idRespuesta = payload[1];
+      respuesta = payload[2];
 
       formularios[index].preguntas[indexPregunta]["idrespuesta"] = idRespuesta;
       formularios[index].preguntas[indexPregunta]["respuesta"] = respuesta;
 
       return { ...state, formularios: formularios };
-    // case SET_COMMENT:
-    //   formulario[action.payload]["comentario"] = action.event;
-    //   return { ...state, formulario: formulario };
+    case SET_DIRECCIONES:
+      index = formularios.findIndex(v => v.id === action.id);
+      payload = action.payload.val;
+      indexPregunta = action.payload.indexPregunta;
+      respuesta = action.payload.val;
+
+      formularios[index].preguntas[
+        indexPregunta
+      ].respuestas[0].texto = respuesta;
+
+      return { ...state, formularios: formularios };
     default:
       return state;
   }
