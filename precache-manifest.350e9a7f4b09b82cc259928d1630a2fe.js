@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "6864f4236364fd986fe718184e479a32",
+    "revision": "b8a2f6db2f24502ef35cc12039165a1b",
     "url": "/PoliData/index.html"
   },
   {
-    "revision": "d98252a7a361120bc09c",
+    "revision": "a9c799d5eb33019e5382",
     "url": "/PoliData/static/css/main.5ecd60fb.chunk.css"
   },
   {
-    "revision": "f0bb16b57fc49d1b18dd",
-    "url": "/PoliData/static/js/2.88e4d92d.chunk.js"
+    "revision": "c4f8b17cdaffb1f07f89",
+    "url": "/PoliData/static/js/2.7bf2ef9e.chunk.js"
   },
   {
     "revision": "b51e62edbcf7a9c4f4ad13f506021d3e",
-    "url": "/PoliData/static/js/2.88e4d92d.chunk.js.LICENSE"
+    "url": "/PoliData/static/js/2.7bf2ef9e.chunk.js.LICENSE"
   },
   {
-    "revision": "d98252a7a361120bc09c",
-    "url": "/PoliData/static/js/main.91d0089f.chunk.js"
+    "revision": "a9c799d5eb33019e5382",
+    "url": "/PoliData/static/js/main.10068748.chunk.js"
   },
   {
     "revision": "b82d7d9d49dd850dec2a",
