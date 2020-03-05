@@ -40,6 +40,9 @@ const Formulario = ({
   const [formError, setFormError] = useState([]);
   const [isLoadingPost, setIsLoadingPost] = useState(false);
   const [isErrorPost, setIsErrorPost] = useState(false);
+  const [mailAnswer, setMailAnswer] = useState([]);
+  const [mailMessage, setMailMessage] = useState("");
+  const [celularMessage, setCelularMessage] = useState("");
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -49,7 +52,44 @@ const Formulario = ({
     setOpen(false);
   };
 
-  const setInputDirecciones = (val, indexPregunta) => {
+  const isValidEmail = email => {
+    const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+    return emailRegex.test(email);
+  };
+
+  const isValidCelular = celular => {
+    const celularRegex = /^[0-9]*$/;
+    return celularRegex.test(celular);
+  };
+
+  const setInputDirecciones = (val, indexPregunta, idpregunta, respuesta) => {
+    if (!val) {
+      setFormError([...formError, idpregunta]);
+    } else {
+      const newArrError =
+        formError.indexOf(idpregunta) !== -1
+          ? formError.filter(item => item !== idpregunta)
+          : formError;
+      setFormError(newArrError);
+    }
+    
+    switch (respuesta) {
+      case "Correo":
+        if (!isValidEmail(val)) {
+          setFormError([...formError, idpregunta]);
+          setMailMessage("Formato de email no válido");
+        }
+        break;
+      case "Celular":
+        if (!isValidCelular(val)) {
+          setFormError([...formError, idpregunta]);
+          setCelularMessage("Sintaxis incorrecta");
+        }
+        break;
+      default:
+        break;
+    }
+    respuesta === "Correo" && setMailAnswer([val, idpregunta]);
     dispatch(setDirecciones(id, { val, indexPregunta }));
   };
 
@@ -77,22 +117,31 @@ const Formulario = ({
 
   const validateForm = () => {
     let errors = [];
+    let mailRes = [];
+
     if (idformulario === "DIRECCIONES") {
       data.forEach((pregunta, indexP) => {
         pregunta.respuestas.forEach(respuesta => {
-          if (
-            respuesta.texto === "" &&
-            (getIndexOf(respuesta.respuesta) === null ||
-              getIndexOf(respuesta.respuesta).texto === "")
-          ) {
-            errors.push(pregunta.idpregunta);
-            setFormError([...errors]);
+          const res = getIndexOf(respuesta.respuesta);
+
+          if (respuesta.texto === "" && res !== null && res.texto !== "") {
+            !formError.includes(pregunta.idpregunta) &&
+              setInputDirecciones(res.texto, indexP);
           }
-          if (
-            getIndexOf(respuesta.respuesta) !== null &&
-            getIndexOf(respuesta.respuesta).texto !== ""
-          ) {
-            setInputDirecciones(getIndexOf(respuesta.respuesta).texto, indexP);
+
+          if (respuesta.texto === "") {
+            errors.push(pregunta.idpregunta);
+            setFormError([...formError, ...errors]);
+          }
+
+          const respuestaok =
+            respuesta.texto !== ""
+              ? respuesta.texto
+              : res !== null && res.texto !== "" && res.texto;
+
+          if (respuesta.respuesta === "Correo") {
+            mailRes = respuestaok;
+            setMailAnswer([respuestaok, pregunta.idpregunta]);
           }
         });
       });
@@ -100,39 +149,56 @@ const Formulario = ({
       data.forEach(pregunta => {
         if (Number(pregunta.idrespuesta) === 0) {
           errors.push(pregunta.idpregunta);
-          setFormError([...errors]);
+          setFormError([...formError, ...errors]);
         }
       });
     }
 
-    if (!errors.length) {
+    if (!errors.length && !formError.length) {
       setFormError([]);
-      submitForm();
+      submitForm(mailRes);
     }
   };
 
-  const submitForm = async () => {
+  const submitForm = async mailRes => {
     const postUrl =
       "https://f2020.azurewebsites.net/api/FaroFormularioPersonaPost?code=rkmGB0kHPzpU/Nxb7L8NT1PAw6jmOxslIH2eXiyjh9vmFIjFRFblAw==";
 
+    const url = "https://nodechatbotjson.azurewebsites.net/mailverify?mail=";
+
     setIsErrorPost(false);
     setIsLoadingPost(true);
-    try {
-      const config = {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(state.formularios[index])
-      };
 
-      await fetch(postUrl, config);
-      setIsErrorPost(false);
-      setIsLoadingPost(false);
-      setOpen(false);
+    try {
+      const response = await fetch(url + mailRes);
+      const data = await response.json();
+      if (data.success && !formError.length) {
+        try {
+          const config = {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(state.formularios[index])
+          };
+
+          await fetch(postUrl, config);
+          setFormError([]);
+          setMailMessage("");
+          setIsErrorPost(false);
+          setIsLoadingPost(false);
+          setOpen(false);
+        } catch (error) {
+          setIsErrorPost(true);
+          setIsLoadingPost(false);
+        }
+      } else {
+        setIsLoadingPost(false);
+        setFormError([mailAnswer[1]]);
+        setMailMessage("Verifique el email ingresado");
+      }
     } catch (error) {
-      setIsErrorPost(true);
       setIsLoadingPost(false);
     }
   };
@@ -159,6 +225,8 @@ const Formulario = ({
               idformulario={idformulario}
               getIndexOf={getIndexOf}
               formError={formError}
+              mailMessage={mailMessage}
+              celularMessage={celularMessage}
             />
           </FormControl>
         </DialogContent>

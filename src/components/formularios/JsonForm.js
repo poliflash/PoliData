@@ -35,13 +35,7 @@ const jsonFormStyles = makeStyles({
 const ErrorMessage = props => {
   const classes = errorMessageStyles(props);
   return (
-    <>
-      {props.idformulario === "DIRECCIONES" ? (
-        <div className={classes.styledWarning}>Debe completar este campo</div>
-      ) : (
-        <div className={classes.styledWarning}>Debe seleccionar una opción</div>
-      )}
-    </>
+    <div className={classes.styledWarning}>Debe seleccionar una opción</div>
   );
 };
 
@@ -52,19 +46,21 @@ const JsonForm = ({
   setInputDirecciones,
   idformulario,
   getIndexOf,
-  formError
+  formError,
+  mailMessage,
+  celularMessage
 }) => {
   const classes = jsonFormStyles();
 
   const handleInputDirecciones = (
     indexPregunta,
-    idRespuesta,
+    idpregunta,
     respuesta
   ) => event => {
     setInputDirecciones(
       event.target.value,
       indexPregunta,
-      idRespuesta,
+      idpregunta,
       respuesta
     );
   };
@@ -99,8 +95,22 @@ const JsonForm = ({
                         <TextField
                           style={{ width: "100%" }}
                           required
+                          error={formError.includes(pregunta.idpregunta)}
+                          helperText={
+                            formError.includes(pregunta.idpregunta)
+                              ? respuesta.respuesta === "Correo"
+                                ? mailMessage
+                                : respuesta.respuesta === "Celular"
+                                ? celularMessage
+                                : "Debe completar este campo"
+                              : ""
+                          }
                           label={respuesta.respuesta}
-                          onChange={handleInputDirecciones(indexP)}
+                          onChange={handleInputDirecciones(
+                            indexP,
+                            pregunta.idpregunta,
+                            respuesta.respuesta
+                          )}
                           defaultValue={
                             respuesta.texto === ""
                               ? getIndexOf(respuesta.respuesta) !== null
@@ -109,10 +119,6 @@ const JsonForm = ({
                               : respuesta.texto
                           }
                           variant="outlined"
-                        />
-                        <ErrorMessage
-                          idformulario={idformulario}
-                          visible={formError.includes(pregunta.idpregunta)}
                         />
                       </Grid>
                     </Grid>
