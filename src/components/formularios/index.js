@@ -17,11 +17,11 @@ import { makeStyles } from "@material-ui/core/styles";
 const useStyles = makeStyles({
   styledFormsContainer: {
     marginTop: "60px",
-    height: "calc(100vh - 60px)"
+    height: "calc(100vh - 60px)",
   },
   styledFormContainer: {
-    textAlign: "center"
-  }
+    textAlign: "center",
+  },
 });
 
 const Formulario = ({
@@ -34,7 +34,7 @@ const Formulario = ({
   state,
   isError,
   idformulario,
-  dispatch
+  dispatch,
 }) => {
   const [open, setOpen] = useState(false);
   const [formError, setFormError] = useState([]);
@@ -52,12 +52,12 @@ const Formulario = ({
     setOpen(false);
   };
 
-  const isValidEmail = email => {
+  const isValidEmail = (email) => {
     const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
     return emailRegex.test(email);
   };
 
-  const isValidCelular = celular => {
+  const isValidCelular = (celular) => {
     const celularRegex = /^[0-9]*$/;
     return celularRegex.test(celular);
   };
@@ -68,11 +68,11 @@ const Formulario = ({
     } else {
       const newArrError =
         formError.indexOf(idpregunta) !== -1
-          ? formError.filter(item => item !== idpregunta)
+          ? formError.filter((item) => item !== idpregunta)
           : formError;
       setFormError(newArrError);
     }
-    
+
     switch (respuesta) {
       case "Correo":
         if (!isValidEmail(val)) {
@@ -93,20 +93,20 @@ const Formulario = ({
     dispatch(setDirecciones(id, { val, indexPregunta }));
   };
 
-  const setFormAnswer = val => {
+  const setFormAnswer = (val) => {
     dispatch(setAnswer(id, val));
   };
 
   const convertRes = {
     Correo: "EM",
     Celular: "TC",
-    Twitter: "TW"
+    Twitter: "TW",
   };
 
-  const getIndexOf = respuesta => {
+  const getIndexOf = (respuesta) => {
     const res = convertRes[respuesta];
     let dir = null;
-    dataPersona.direcciones.forEach(direccion => {
+    dataPersona.direcciones.forEach((direccion) => {
       if (direccion.idrespuesta === res) {
         dir = direccion;
         return;
@@ -121,7 +121,7 @@ const Formulario = ({
 
     if (idformulario === "DIRECCIONES") {
       data.forEach((pregunta, indexP) => {
-        pregunta.respuestas.forEach(respuesta => {
+        pregunta.respuestas.forEach((respuesta) => {
           const res = getIndexOf(respuesta.respuesta);
 
           if (respuesta.texto === "" && res !== null && res.texto !== "") {
@@ -146,7 +146,7 @@ const Formulario = ({
         });
       });
     } else {
-      data.forEach(pregunta => {
+      data.forEach((pregunta) => {
         if (Number(pregunta.idrespuesta) === 0) {
           errors.push(pregunta.idpregunta);
           setFormError([...formError, ...errors]);
@@ -160,7 +160,7 @@ const Formulario = ({
     }
   };
 
-  const submitForm = async mailRes => {
+  const submitForm = async (mailRes) => {
     const postUrl =
       "https://f2020.azurewebsites.net/api/FaroFormularioPersonaPost?code=rkmGB0kHPzpU/Nxb7L8NT1PAw6jmOxslIH2eXiyjh9vmFIjFRFblAw==";
 
@@ -178,9 +178,9 @@ const Formulario = ({
             method: "POST",
             headers: {
               Accept: "application/json",
-              "Content-Type": "application/json"
+              "Content-Type": "application/json",
             },
-            body: JSON.stringify(state.formularios[index])
+            body: JSON.stringify(state.formularios[index]),
           };
 
           await fetch(postUrl, config);
@@ -253,11 +253,11 @@ const Formularios = ({ dataPersona, cedula }) => {
   const {
     dataPost: data,
     isLoadingPost: isLoading,
-    isErrorPost: isError
+    isErrorPost: isError,
   } = useFetchPost(url, {
     id: {
-      cedula: cedula
-    }
+      cedula: cedula,
+    },
   });
 
   useEffect(() => {
