@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.js": "/PoliData/static/js/main.18763992.chunk.js",
-    "main.js.map": "/PoliData/static/js/main.18763992.chunk.js.map",
+    "main.js": "/PoliData/static/js/main.ea4e535a.chunk.js",
+    "main.js.map": "/PoliData/static/js/main.ea4e535a.chunk.js.map",
     "runtime-main.js": "/PoliData/static/js/runtime-main.29aab98f.js",
     "runtime-main.js.map": "/PoliData/static/js/runtime-main.29aab98f.js.map",
-    "static/js/2.9b1aeed7.chunk.js": "/PoliData/static/js/2.9b1aeed7.chunk.js",
-    "static/js/2.9b1aeed7.chunk.js.map": "/PoliData/static/js/2.9b1aeed7.chunk.js.map",
+    "static/js/2.4777ddc1.chunk.js": "/PoliData/static/js/2.4777ddc1.chunk.js",
+    "static/js/2.4777ddc1.chunk.js.map": "/PoliData/static/js/2.4777ddc1.chunk.js.map",
     "index.html": "/PoliData/index.html",
-    "precache-manifest.761133a823181a2b26167a40a3e4e2b1.js": "/PoliData/precache-manifest.761133a823181a2b26167a40a3e4e2b1.js",
+    "precache-manifest.d812ed0a301f2eed04b160df11efed0b.js": "/PoliData/precache-manifest.d812ed0a301f2eed04b160df11efed0b.js",
     "service-worker.js": "/PoliData/service-worker.js",
-    "static/js/2.9b1aeed7.chunk.js.LICENSE.txt": "/PoliData/static/js/2.9b1aeed7.chunk.js.LICENSE.txt"
+    "static/js/2.4777ddc1.chunk.js.LICENSE.txt": "/PoliData/static/js/2.4777ddc1.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.29aab98f.js",
-    "static/js/2.9b1aeed7.chunk.js",
-    "static/js/main.18763992.chunk.js"
+    "static/js/2.4777ddc1.chunk.js",
+    "static/js/main.ea4e535a.chunk.js"
   ]
 }
