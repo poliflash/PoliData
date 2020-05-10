@@ -3,27 +3,48 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import Navbar from "./components/Navbar";
 import Dashboard from "./containers/Dashboard";
 import { useFetch } from "./components/hooks/useFetch";
+import { useAuth } from "./components/hooks/useAuth";
+import LoadingSpinner from "./components/LoadingSpinner";
+import Grid from "@material-ui/core/Grid";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles({
+  styledFormsContainer: {
+    marginTop: "60px",
+    height: "calc(100vh - 60px)",
+  },
+});
 
 const App = () => {
-  const href = new URL(window.location.href);
-  const cedula = href.searchParams.get("cedula");
+  const classes = useStyles();
 
-  const url =
-    "https://openfaroapi.azurewebsites.net/api/personagetv2?idorganizacion=10&identificacion=";
-
-  const { data, isLoading, isError } = useFetch(url + cedula);
-
+  const { data: authData, isLoggedIn } = useAuth();
+  
+  const url = `https://openfaroapi.azurewebsites.net/api/personagetv2?idorganizacion=0&identificacion=${authData.email}`;
+  const { data, isLoading, isError } = useFetch(url);
+  
   return (
-    <div className="App">
+    <>
       <CssBaseline />
       <Navbar data={data} isLoading={isLoading} isError={isError} />
-      <Dashboard
-        data={data}
-        cedula={cedula}
-        isError={isError}
-        isLoading={isLoading}
-      />
-    </div>
+      {isLoggedIn && data?.flag === "1" ? (
+        <Dashboard data={data} />
+      ) : (
+        <Grid
+          className={classes.styledFormsContainer}
+          direction="column"
+          justify="center"
+          alignItems="center"
+          container
+          spacing={0}>
+          {data && !isLoading && Object.keys(data).length > 2 ? (
+            <h1>{data?.msj}</h1>
+          ) : (
+            <LoadingSpinner />
+          )}
+        </Grid>
+      )}
+    </>
   );
 };
 

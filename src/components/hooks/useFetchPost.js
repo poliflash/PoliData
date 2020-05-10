@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 
 export const useFetchPost = (url, message) => {
-  const [dataPost, setDataPost] = useState();
-  const [isLoadingPost, setIsLoadingPost] = useState(false);
-  const [isErrorPost, setIsErrorPost] = useState(false);
+  const [data, setData] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+
   const postData = async (url, message) => {
-    setIsErrorPost(false);
-    setIsLoadingPost(true);
+    setIsError(false);
+    setIsLoading(true);
     try {
       const config = {
         method: "POST",
@@ -19,21 +20,21 @@ export const useFetchPost = (url, message) => {
 
       const response = await fetch(url, config);
       const data = await response.json();
-      setDataPost(data);
-      setIsErrorPost(false);
-      setIsLoadingPost(false);
+      setData(data);
+      setIsError(false);
+      setIsLoading(false);
     } catch (error) {
-      setIsErrorPost(true);
-      setIsLoadingPost(false);
+      setIsError(true);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     postData(url, message);
-    setIsErrorPost(false);
-    setIsLoadingPost(false);
+    setIsError(false);
+    setIsLoading(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
 
-  return { dataPost, isLoadingPost, isErrorPost };
+  return { data, isLoading, isError };
 };
