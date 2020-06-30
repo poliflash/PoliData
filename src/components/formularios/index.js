@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Alert from "@material-ui/lab/Alert";
 
 import LoadingSpinner from "../LoadingSpinner";
-import { useFetchPost } from "../hooks/useFetchPost";
+import { useFetch } from "../hooks/useFetch";
 import { setJson } from "./actions";
 import { initialState, reducer } from "./reducer";
 import Formulario from "./Formulario";
@@ -19,26 +19,20 @@ const useStyles = makeStyles({
   },
 });
 
-const Formularios = ({ data }) => {
+const Formularios = ({ data, authMail }) => {
   const classes = useStyles();
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  const url =
-    "https://f2020.azurewebsites.net/api/FaroFormulariosPersona?code=nbjfp6Cn8Mx3/WPr3DCwMXV8EZbfw2CB8UIMOTyfW8TYtlBSsbXGqw==";
+  const url = `https://farodesarrollo2010.azurewebsites.net/api/GetFormulariosByIdentificacion?code=3qBpF26X8yObh7BXNTdeYaxNQWnWcY7vrifuFHXKfZoOFR9yaaZTwA==&cedula=${data.identificacion}`
 
   const {
-    data: dataPost,
-    isLoading: isLoadingPost,
-    isError: isErrorPost,
-  } = useFetchPost(url, {
-    id: {
-      cedula: data.identificacion,
-    },
-  });
+    data: dataFetch,
+    isLoading,
+    isError,
+  } = useFetch(url);
 
   useEffect(() => {
-    !isLoadingPost && dataPost && dispatch(setJson(dataPost));
-  }, [dataPost, isLoadingPost]);
+    !isLoading && dataFetch && dispatch(setJson(dataFetch));
+  }, [dataFetch, isLoading]);
 
   return (
     <Grid
@@ -48,9 +42,9 @@ const Formularios = ({ data }) => {
       alignItems="center"
       container
       spacing={0}>
-      {dataPost && !isLoadingPost ? (
-        dataPost.length ? (
-          dataPost.map((formulario, index) => (
+      {dataFetch && !isLoading ? (
+        dataFetch.length ? (
+          dataFetch.map((formulario, index) => (
             <Grid
               key={formulario.id}
               className={classes.styledFormContainer}
@@ -60,15 +54,16 @@ const Formularios = ({ data }) => {
               md={4}
               lg={3}>
               <Formulario
+                authMail={authMail}
                 index={index}
                 state={state}
-                isError={isErrorPost}
+                isError={isError}
                 id={formulario.id}
                 idformulario={formulario.idformulario}
                 dispatch={dispatch}
                 data={formulario.preguntas}
-                dataPersona={dataPost}
-                message={formulario.mensaje}
+                dataPersona={dataFetch}
+                message={formulario.preguntas.mensaje}
                 title={formulario.idformulario}
               />
             </Grid>

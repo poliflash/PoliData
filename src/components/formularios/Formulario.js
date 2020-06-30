@@ -11,6 +11,7 @@ import JsonForm from "./JsonForm";
 
 const Formulario = ({
   id,
+  authMail,
   index,
   data,
   dataPersona,
@@ -57,6 +58,9 @@ const Formulario = ({
       setFormError(newArrError);
     }
 
+    setMailMessage("");
+    setCelularMessage("");
+
     switch (respuesta) {
       case "Correo":
         if (!isValidEmail(val)) {
@@ -82,7 +86,7 @@ const Formulario = ({
   };
 
   const convertRes = {
-    Correo: "EM",
+    Correo: "Correo",
     Celular: "TC",
     Twitter: "TW",
   };
@@ -99,29 +103,33 @@ const Formulario = ({
     return dir;
   };
 
+  const getIndexOfRes = (indexP, res_id) => {
+    if (res_id) {
+      const res = data.preguntas[indexP].respuestas
+        .map((respuesta) => {
+          return respuesta.idrespuesta;
+        })
+        .indexOf(Number(res_id));
+
+      return res;
+    }
+
+    return null;
+  };
+
   const validateForm = () => {
     let errors = [];
     let mailRes = [];
 
     if (idformulario === "DIRECCIONES") {
-      data.forEach((pregunta, indexP) => {
+      data.preguntas.forEach((pregunta, indexP) => {
         pregunta.respuestas.forEach((respuesta) => {
-          const res = getIndexOf(respuesta.respuesta);
-
-          if (respuesta.texto === "" && res !== null && res.texto !== "") {
-            !formError.includes(pregunta.idpregunta) &&
-              setInputDirecciones(res.texto, indexP);
-          }
-
           if (respuesta.texto === "") {
             errors.push(pregunta.idpregunta);
             setFormError([...formError, ...errors]);
           }
 
-          const respuestaok =
-            respuesta.texto !== ""
-              ? respuesta.texto
-              : res !== null && res.texto !== "" && res.texto;
+          const respuestaok = respuesta.texto !== "" ? respuesta.texto : "";
 
           if (respuesta.respuesta === "Correo") {
             mailRes = respuestaok;
@@ -130,10 +138,13 @@ const Formulario = ({
         });
       });
     } else {
-      data.forEach((pregunta) => {
-        if (Number(pregunta.idrespuesta) === 0) {
+      setFormError(errors);
+      mailRes = authMail;
+
+      data.preguntas.forEach((pregunta) => {
+        if (Number(pregunta.idrespuesta) === 0 || pregunta.idrespuesta === "") {
           errors.push(pregunta.idpregunta);
-          setFormError([...formError, ...errors]);
+          setFormError(errors);
         }
       });
     }
@@ -146,7 +157,7 @@ const Formulario = ({
 
   const submitForm = async (mailRes) => {
     const postUrl =
-      "https://f2020.azurewebsites.net/api/FaroFormularioPersonaPost?code=rkmGB0kHPzpU/Nxb7L8NT1PAw6jmOxslIH2eXiyjh9vmFIjFRFblAw==";
+      "https://farodesarrollo2010.azurewebsites.net/api/FormularioPersonaPost?code=VtEH0pzl8ADUEHmaoT7NDikIh6WGOgZuYHc5pvLsDdeALF1iqLdKWg==";
 
     const url = "https://nodechatbotjson.azurewebsites.net/mailverify?mail=";
 
@@ -155,7 +166,7 @@ const Formulario = ({
     try {
       const response = await fetch(url + mailRes);
       const data = await response.json();
-      if (data.success && !formError.length) {
+      if (data.success) {
         try {
           const config = {
             method: "POST",
@@ -205,6 +216,7 @@ const Formulario = ({
               setInputDirecciones={setInputDirecciones}
               idformulario={idformulario}
               getIndexOf={getIndexOf}
+              getIndexOfRes={getIndexOfRes}
               formError={formError}
               mailMessage={mailMessage}
               celularMessage={celularMessage}
