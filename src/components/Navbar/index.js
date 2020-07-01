@@ -16,6 +16,12 @@ const useStyles = makeStyles({
     fontSize: ".9rem",
     fontWeight: "bold",
   },
+  styledRol: {
+    marginLeft: "15px",
+  },
+  styledCod: {
+    marginLeft: "5px",
+  },
 });
 
 const Navbar = ({ data, isLoading, isError }) => {
@@ -26,11 +32,21 @@ const Navbar = ({ data, isLoading, isError }) => {
       <Toolbar>
         <img src={logo} alt="logo" className={classes.styledLogo} />
         {!isError && !isLoading && data && (
-          <span className={classes.styledSpanName}>
-            {data.apellido1
-              ? `${data.nombre1} ${data.apellido1}`
-              : data.nombre1}
-          </span>
+          <>
+            <span className={classes.styledSpanName}>
+              {data.apellido1
+                ? `${data.nombre1} ${data.apellido1}`
+                : data.nombre1}
+            </span>
+            {data?.roles?.length ? (
+              <>
+                <span className={classes.styledRol}>
+                  {data.roles[0].descripcion}
+                </span>
+                <span className={classes.styledCod}>{data.roles[0].codcne}</span>
+              </>
+            ) : null}
+          </>
         )}
       </Toolbar>
     </AppBar>

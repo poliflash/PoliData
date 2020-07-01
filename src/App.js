@@ -25,7 +25,7 @@ const App = () => {
     isLoggedIn && authData.email
       ? `https://openfaroapi.azurewebsites.net/api/personagetv2?idorganizacion=0&identificacion=${authData.email}`
       : "";
-      
+
   const { data, isLoading, isError } = useFetch(url);
 
   return (

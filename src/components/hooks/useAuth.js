@@ -13,27 +13,43 @@ export const useAuth = () => {
     setIsLoggedIn(false);
     setIsError(false);
 
-    !firebase.apps.length && firebase.initializeApp(firebaseConfig).firestore();
+    firebase.initializeApp(firebaseConfig).firestore();
     const provider = new firebase.auth.GoogleAuthProvider();
 
     firebase.auth().onAuthStateChanged((user) => {
+      firebase
+        .auth()
+        .getRedirectResult()
+        .then((result) => {
+          if (!result.credential) {
+            firebase.auth().signInWithRedirect(provider);
+          }
+        })
+        .catch((error) => {
+          setIsError(true);
+        });
+
       if (user) {
         setIsLoggedIn(true);
         setData({ email: user.email });
-      } else {
-        if (!firebase.auth().currentUser)
-          firebase
-            .auth()
-            .getRedirectResult()
-            .then((result) => {
-              if (!result.credential) {
-                firebase.auth().signInWithRedirect(provider);
-              }
-            })
-            .catch((error) => {
-              setIsError(true);
-            });
       }
+      // if (user) {
+      //   setIsLoggedIn(true);
+      //   setData({ email: user.email });
+      // } else {
+      //   if (!firebase.auth().currentUser)
+      //     firebase
+      //       .auth()
+      //       .getRedirectResult()
+      //       .then((result) => {
+      //         if (!result.credential) {
+      //           firebase.auth().signInWithRedirect(provider);
+      //         }
+      //       })
+      //       .catch((error) => {
+      //         setIsError(true);
+      //       });
+      // }
     });
   };
 
